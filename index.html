@@ -2,142 +2,230 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Google Sans Flex: Verificación Real</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sans Flex: Master Console</title>
     <style>
         @font-face {
-            font-family: 'Google Sans Flex';
+            font-family: 'GSansFlex';
             src: url('./GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
             font-stretch: 25% 151%;
         }
 
         :root {
-            --wght: 400; --wdth: 100; --ROND: 0; --GRAD: 0;
-            --bg: #050505; --accent: #4285f4;
+            /* Valores iniciales */
+            --wght: 400;
+            --wdth: 100;
+            --opsz: 14;
+            --GRAD: 0;
+            --slnt: 0;
+            --ROND: 0;
+            
+            --bg-color: #0e1117;
+            --panel-color: #161b22;
+            --text-color: #f0f6fc;
+            --accent-color: #4285f4;
         }
 
         body {
-            font-family: 'Google Sans Flex', Arial, sans-serif;
-            background: var(--bg);
-            color: white;
+            font-family: 'GSansFlex', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- PANEL DE CONTROL (Izquierda) --- */
+        .sidebar {
+            background-color: var(--panel-color);
+            padding: 30px;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            overflow-y: auto;
+        }
+
+        h2 { margin: 0 0 10px 0; font-size: 1.2rem; opacity: 0.8; }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #8b949e;
+            display: flex;
+            justify-content: space-between;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .value-display { color: var(--accent-color); font-weight: bold; }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+        }
+
+        /* --- ÁREA DE VISUALIZACIÓN (Derecha) --- */
+        .preview-area {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-        }
-
-        /* Indicador visual de estado */
-        #status-box {
-            position: fixed;
-            top: 20px;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px;
+            position: relative;
         }
 
         #main-text {
-            font-size: 12vw;
+            font-size: 8vw;
+            line-height: 1.1;
             text-align: center;
+            outline: none;
+            /* Aplicación de variables */
             font-variation-settings: 
-                'wght' var(--wght), 'wdth' var(--wdth), 
-                'ROND' var(--ROND), 'GRAD' var(--GRAD);
-            user-select: none;
+                'wght' var(--wght),
+                'wdth' var(--wdth),
+                'opsz' var(--opsz),
+                'GRAD' var(--GRAD),
+                'slnt' var(--slnt),
+                'ROND' var(--ROND);
+            
+            /* Importante para que el slider de opsz funcione manualmente */
+            font-optical-sizing: none; 
+            transition: font-variation-settings 0.1s linear;
         }
 
-        .controls {
-            margin-top: 50px;
-            background: rgba(255,255,255,0.05);
-            padding: 25px;
-            border-radius: 20px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
-        label { color: #888; font-size: 11px; font-weight: bold; }
-        input { width: 160px; accent-color: var(--accent); cursor: pointer; }
-        
-        /* Regla para medir el ancho (invisible para el usuario) */
-        #font-tester {
+        /* Bloque de código CSS generado */
+        .code-block {
             position: absolute;
-            visibility: hidden;
-            height: auto;
-            width: auto;
-            white-space: nowrap;
-            font-family: 'Google Sans Flex';
-            font-size: 100px;
+            bottom: 30px;
+            background: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #7ee787;
+            border: 1px solid #30363d;
+            max-width: 90%;
+            cursor: pointer;
+        }
+        
+        .code-block:hover { background: rgba(0,0,0,0.8); }
+        .tooltip { font-size: 0.7rem; color: #8b949e; margin-top: 5px; display: block;}
+
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+            .sidebar { height: 40vh; order: 2; border-right: none; border-top: 1px solid #30363d; }
+            .preview-area { height: 60vh; order: 1; }
+            #main-text { font-size: 15vw; }
         }
     </style>
 </head>
 <body>
 
-    <div id="status-box">Verificando...</div>
-    
-    <div id="main-text" contenteditable="true">G FLEX</div>
+    <aside class="sidebar">
+        <div>
+            <h2>Google Sans Flex</h2>
+            <p style="font-size: 0.8rem; color: #8b949e;">Ajusta los 6 ejes variables.</p>
+        </div>
 
-    <div id="font-tester" style="font-variation-settings: 'wdth' 151;">MMMMMMMMMM</div>
-
-    <div class="controls">
-        <div class="ctrl-group">
-            <label>PESO (wght): <span id="v-wght">400</span></label>
+        <div class="control-group">
+            <label>Weight (wght) <span id="val-wght" class="value-display">400</span></label>
             <input type="range" id="wght" min="100" max="1000" value="400">
         </div>
-        <div class="ctrl-group">
-            <label>ANCHO (wdth): <span id="v-wdth">100</span></label>
+
+        <div class="control-group">
+            <label>Width (wdth) <span id="val-wdth" class="value-display">100</span></label>
             <input type="range" id="wdth" min="25" max="151" value="100">
         </div>
-        <div class="ctrl-group">
-            <label>REDONDEZ (ROND): <span id="v-ROND">0</span></label>
-            <input type="range" id="ROND" min="0" max="100" value="0">
+
+        <div class="control-group">
+            <label title="Optimiza legibilidad según tamaño">Optical Size (opsz) <span id="val-opsz" class="value-display">14</span></label>
+            <input type="range" id="opsz" min="8" max="144" value="14">
         </div>
-        <div class="ctrl-group">
-            <label>GRADO (GRAD): <span id="v-GRAD">0</span></label>
+
+        <div class="control-group">
+            <label title="Inclinación sin ser cursiva real">Slant (slnt) <span id="val-slnt" class="value-display">0</span></label>
+            <input type="range" id="slnt" min="-10" max="0" value="0" step="1">
+        </div>
+
+        <div class="control-group">
+            <label title="Grosor sin cambiar ancho">Grade (GRAD) <span id="val-GRAD" class="value-display">0</span></label>
             <input type="range" id="GRAD" min="-200" max="150" value="0">
         </div>
-    </div>
+
+        <div class="control-group">
+            <label title="Redondez de esquinas">Roundness (ROND) <span id="val-ROND" class="value-display">0</span></label>
+            <input type="range" id="ROND" min="0" max="100" value="0">
+        </div>
+
+        <button onclick="resetDefaults()" style="margin-top:20px; padding:10px; background:#21262d; color:white; border:none; border-radius:6px; cursor:pointer;">Restablecer</button>
+    </aside>
+
+    <main class="preview-area">
+        <div id="main-text" contenteditable="true">Google<br>Sans Flex</div>
+        
+        <div class="code-block" id="copy-target" title="Click para copiar CSS">
+            font-variation-settings: 'wght' 400, 'wdth' 100, 'opsz' 14, 'GRAD' 0, 'slnt' 0, 'ROND' 0;
+            <span class="tooltip">(Click para copiar código CSS)</span>
+        </div>
+    </main>
 
     <script>
-        const tester = document.getElementById('font-tester');
-        const statusBox = document.getElementById('status-box');
+        const inputs = document.querySelectorAll('input[type="range"]');
+        const codeBlock = document.getElementById('copy-target');
 
-        function verifyFont() {
-            // Medimos el ancho de 10 'M's con el eje wdth al máximo
-            const width = tester.offsetWidth;
+        function updateFont() {
+            let settings = [];
             
-            // Si la fuente es Arial o genérica, el ancho será fijo (aprox 1100-1200px)
-            // Si es Google Sans Flex en wdth 151, el ancho será notablemente mayor (aprox 1500px+)
-            // Usamos un umbral para detectar la expansión real del eje variable
-            if (width > 1350) {
-                statusBox.style.background = "#1a7f37";
-                statusBox.style.color = "white";
-                statusBox.textContent = "✅ CARGADA: Google Sans Flex Detectada";
-            } else {
-                statusBox.style.background = "#cf222e";
-                statusBox.style.color = "white";
-                statusBox.textContent = "❌ ERROR: Fuente no detectada (Usando Arial/System)";
-            }
+            inputs.forEach(input => {
+                const id = input.id;
+                const val = input.value;
+                
+                // Actualizar variable CSS
+                document.documentElement.style.setProperty(`--${id}`, val);
+                
+                // Actualizar número en pantalla
+                document.getElementById(`val-${id}`).innerText = val;
+                
+                // Construir string para el bloque de código
+                settings.push(`'${id}' ${val}`);
+            });
+
+            // Actualizar texto del código
+            const settingsString = `font-variation-settings: ${settings.join(', ')};`;
+            codeBlock.innerHTML = settingsString + '<span class="tooltip">(Click para copiar código CSS)</span>';
         }
 
-        // Ejecutar verificación con un pequeño delay para que el motor de render actúe
-        window.onload = () => {
-            setTimeout(verifyFont, 500);
-        };
+        // Event Listeners
+        inputs.forEach(input => input.addEventListener('input', updateFont));
 
-        // Lógica de Sliders
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(i => {
-            i.oninput = () => {
-                document.documentElement.style.setProperty(`--${i.id}`, i.value);
-                document.getElementById(`v-${i.id}`).innerText = i.value;
-            };
+        // Función Copiar
+        codeBlock.addEventListener('click', () => {
+            const textToCopy = codeBlock.innerText.replace('(Click para copiar código CSS)', '').trim();
+            navigator.clipboard.writeText(textToCopy);
+            alert("¡CSS copiado al portapapeles!");
         });
+
+        // Función Reset
+        function resetDefaults() {
+            document.getElementById('wght').value = 400;
+            document.getElementById('wdth').value = 100;
+            document.getElementById('opsz').value = 14;
+            document.getElementById('GRAD').value = 0;
+            document.getElementById('slnt').value = 0;
+            document.getElementById('ROND').value = 0;
+            updateFont();
+        }
     </script>
 </body>
 </html>
