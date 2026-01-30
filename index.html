@@ -3,229 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sans Flex: Master Console</title>
+    <title>Google Sans Flex: Dashboard Pro</title>
+    <script src="js/sortable.min.js"></script>
+    <script src="js/chart.min.js"></script>
+    
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
+            src: url('fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
-            font-stretch: 25% 151%;
         }
 
         :root {
-            /* Valores iniciales */
-            --wght: 400;
-            --wdth: 100;
-            --opsz: 14;
-            --GRAD: 0;
-            --slnt: 0;
-            --ROND: 0;
-            
-            --bg-color: #0e1117;
-            --panel-color: #161b22;
-            --text-color: #f0f6fc;
-            --accent-color: #4285f4;
+            --wght: 400; --wdth: 100; --opsz: 14; --GRAD: 0; --slnt: 0; --ROND: 0;
+            --bg: #0d1117; --panel: #161b22; --accent: #58a6ff;
         }
 
         body {
             font-family: 'GSansFlex', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            height: 100vh;
-            overflow: hidden;
+            background: var(--bg); color: #c9d1d9;
+            margin: 0; display: grid; grid-template-columns: 320px 1fr;
+            height: 100vh; overflow: hidden;
         }
 
-        /* --- PANEL DE CONTROL (Izquierda) --- */
+        /* SIDEBAR CON SORTABLE */
         .sidebar {
-            background-color: var(--panel-color);
-            padding: 30px;
-            border-right: 1px solid #30363d;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            overflow-y: auto;
+            background: var(--panel); padding: 20px;
+            border-right: 1px solid #30363d; display: flex; flex-direction: column;
         }
 
-        h2 { margin: 0 0 10px 0; font-size: 1.2rem; opacity: 0.8; }
-        
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .sortable-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+
+        .control-card {
+            background: #21262d; padding: 15px; border-radius: 8px;
+            cursor: grab; border: 1px solid transparent; transition: 0.2s;
+        }
+        .control-card:active { cursor: grabbing; border-color: var(--accent); }
+
+        .label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+        .val { color: var(--accent); font-weight: bold; }
+
+        input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+        /* PREVIEW AREA */
+        .main-content {
+            display: grid; grid-template-rows: 1fr 300px; padding: 40px; gap: 20px;
         }
 
-        label {
-            font-size: 0.85rem;
-            color: #8b949e;
-            display: flex;
-            justify-content: space-between;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        #preview-text {
+            font-size: 6vw; text-align: center; align-self: center; outline: none;
+            font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
+            font-optical-sizing: none;
         }
 
-        .value-display { color: var(--accent-color); font-weight: bold; }
-
-        input[type="range"] {
-            width: 100%;
-            cursor: pointer;
-            accent-color: var(--accent-color);
+        .charts-container {
+            background: rgba(255,255,255,0.03); border-radius: 16px;
+            padding: 20px; display: flex; justify-content: center;
         }
 
-        /* --- ÁREA DE VISUALIZACIÓN (Derecha) --- */
-        .preview-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            position: relative;
-        }
-
-        #main-text {
-            font-size: 8vw;
-            line-height: 1.1;
-            text-align: center;
-            outline: none;
-            /* Aplicación de variables */
-            font-variation-settings: 
-                'wght' var(--wght),
-                'wdth' var(--wdth),
-                'opsz' var(--opsz),
-                'GRAD' var(--GRAD),
-                'slnt' var(--slnt),
-                'ROND' var(--ROND);
-            
-            /* Importante para que el slider de opsz funcione manualmente */
-            font-optical-sizing: none; 
-            transition: font-variation-settings 0.1s linear;
-        }
-
-        /* Bloque de código CSS generado */
-        .code-block {
-            position: absolute;
-            bottom: 30px;
-            background: rgba(0,0,0,0.6);
-            padding: 15px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            color: #7ee787;
-            border: 1px solid #30363d;
-            max-width: 90%;
-            cursor: pointer;
-        }
-        
-        .code-block:hover { background: rgba(0,0,0,0.8); }
-        .tooltip { font-size: 0.7rem; color: #8b949e; margin-top: 5px; display: block;}
-
-        /* Responsive para móviles */
-        @media (max-width: 768px) {
-            body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-            .sidebar { height: 40vh; order: 2; border-right: none; border-top: 1px solid #30363d; }
-            .preview-area { height: 60vh; order: 1; }
-            #main-text { font-size: 15vw; }
+        .code-output {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #000; color: #7ee787; padding: 10px 20px;
+            border-radius: 6px; font-family: monospace; font-size: 12px;
         }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div>
-            <h2>Google Sans Flex</h2>
-            <p style="font-size: 0.8rem; color: #8b949e;">Ajusta los 6 ejes variables.</p>
+        <h2>Lab Console</h2>
+        <p style="font-size: 11px; opacity: 0.6;">Arrastra las tarjetas para reordenar (SortableJS)</p>
+        
+        <div id="controls-list" class="sortable-list">
+            <div class="control-card" data-id="wght">
+                <div class="label-row"><span>WEIGHT</span> <span class="val" id="v-wght">400</span></div>
+                <input type="range" id="wght" min="100" max="1000" value="400">
+            </div>
+            <div class="control-card" data-id="wdth">
+                <div class="label-row"><span>WIDTH</span> <span class="val" id="v-wdth">100</span></div>
+                <input type="range" id="wdth" min="25" max="151" value="100">
+            </div>
+            <div class="control-card" data-id="ROND">
+                <div class="label-row"><span>ROUND</span> <span class="val" id="v-ROND">0</span></div>
+                <input type="range" id="ROND" min="0" max="100" value="0">
+            </div>
+            <div class="control-card" data-id="GRAD">
+                <div class="label-row"><span>GRADE</span> <span class="val" id="v-GRAD">0</span></div>
+                <input type="range" id="GRAD" min="-200" max="150" value="0">
+            </div>
+            <div class="control-card" data-id="opsz">
+                <div class="label-row"><span>OPTICAL</span> <span class="val" id="v-opsz">14</span></div>
+                <input type="range" id="opsz" min="8" max="144" value="14">
+            </div>
+            <div class="control-card" data-id="slnt">
+                <div class="label-row"><span>SLANT</span> <span class="val" id="v-slnt">0</span></div>
+                <input type="range" id="slnt" min="-10" max="0" value="0">
+            </div>
         </div>
-
-        <div class="control-group">
-            <label>Weight (wght) <span id="val-wght" class="value-display">400</span></label>
-            <input type="range" id="wght" min="100" max="1000" value="400">
-        </div>
-
-        <div class="control-group">
-            <label>Width (wdth) <span id="val-wdth" class="value-display">100</span></label>
-            <input type="range" id="wdth" min="25" max="151" value="100">
-        </div>
-
-        <div class="control-group">
-            <label title="Optimiza legibilidad según tamaño">Optical Size (opsz) <span id="val-opsz" class="value-display">14</span></label>
-            <input type="range" id="opsz" min="8" max="144" value="14">
-        </div>
-
-        <div class="control-group">
-            <label title="Inclinación sin ser cursiva real">Slant (slnt) <span id="val-slnt" class="value-display">0</span></label>
-            <input type="range" id="slnt" min="-10" max="0" value="0" step="1">
-        </div>
-
-        <div class="control-group">
-            <label title="Grosor sin cambiar ancho">Grade (GRAD) <span id="val-GRAD" class="value-display">0</span></label>
-            <input type="range" id="GRAD" min="-200" max="150" value="0">
-        </div>
-
-        <div class="control-group">
-            <label title="Redondez de esquinas">Roundness (ROND) <span id="val-ROND" class="value-display">0</span></label>
-            <input type="range" id="ROND" min="0" max="100" value="0">
-        </div>
-
-        <button onclick="resetDefaults()" style="margin-top:20px; padding:10px; background:#21262d; color:white; border:none; border-radius:6px; cursor:pointer;">Restablecer</button>
     </aside>
 
-    <main class="preview-area">
-        <div id="main-text" contenteditable="true">Google<br>Sans Flex</div>
+    <main class="main-content">
+        <div id="preview-text" contenteditable="true">Dashboard Flex</div>
         
-        <div class="code-block" id="copy-target" title="Click para copiar CSS">
-            font-variation-settings: 'wght' 400, 'wdth' 100, 'opsz' 14, 'GRAD' 0, 'slnt' 0, 'ROND' 0;
-            <span class="tooltip">(Click para copiar código CSS)</span>
+        <div class="charts-container">
+            <canvas id="fontChart"></canvas>
         </div>
     </main>
 
+    <div class="code-output" id="css-code">font-variation-settings: ...</div>
+
     <script>
-        const inputs = document.querySelectorAll('input[type="range"]');
-        const codeBlock = document.getElementById('copy-target');
-
-        function updateFont() {
-            let settings = [];
-            
-            inputs.forEach(input => {
-                const id = input.id;
-                const val = input.value;
-                
-                // Actualizar variable CSS
-                document.documentElement.style.setProperty(`--${id}`, val);
-                
-                // Actualizar número en pantalla
-                document.getElementById(`val-${id}`).innerText = val;
-                
-                // Construir string para el bloque de código
-                settings.push(`'${id}' ${val}`);
-            });
-
-            // Actualizar texto del código
-            const settingsString = `font-variation-settings: ${settings.join(', ')};`;
-            codeBlock.innerHTML = settingsString + '<span class="tooltip">(Click para copiar código CSS)</span>';
-        }
-
-        // Event Listeners
-        inputs.forEach(input => input.addEventListener('input', updateFont));
-
-        // Función Copiar
-        codeBlock.addEventListener('click', () => {
-            const textToCopy = codeBlock.innerText.replace('(Click para copiar código CSS)', '').trim();
-            navigator.clipboard.writeText(textToCopy);
-            alert("¡CSS copiado al portapapeles!");
+        // --- 1. INICIALIZAR SORTABLEJS ---
+        const el = document.getElementById('controls-list');
+        Sortable.create(el, {
+            animation: 150,
+            ghostClass: 'blue-background-class'
         });
 
-        // Función Reset
-        function resetDefaults() {
-            document.getElementById('wght').value = 400;
-            document.getElementById('wdth').value = 100;
-            document.getElementById('opsz').value = 14;
-            document.getElementById('GRAD').value = 0;
-            document.getElementById('slnt').value = 0;
-            document.getElementById('ROND').value = 0;
-            updateFont();
+        // --- 2. INICIALIZAR CHART.JS ---
+        const ctx = document.getElementById('fontChart').getContext('2d');
+        const fontChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Weight', 'Width', 'Round', 'Grade', 'Optical', 'Slant'],
+                datasets: [{
+                    label: 'Configuración de Fuente',
+                    data: [400, 100, 0, 0, 14, 0],
+                    backgroundColor: 'rgba(88, 166, 255, 0.2)',
+                    borderColor: '#58a6ff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                scales: { r: { beginAtZero: true, grid: { color: '#30363d' }, ticks: { display: false } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // --- 3. LÓGICA DE ACTUALIZACIÓN ---
+        const inputs = document.querySelectorAll('input[type="range"]');
+        
+        function updateAll() {
+            const vals = {
+                wght: document.getElementById('wght').value,
+                wdth: document.getElementById('wdth').value,
+                ROND: document.getElementById('ROND').value,
+                GRAD: document.getElementById('GRAD').value,
+                opsz: document.getElementById('opsz').value,
+                slnt: document.getElementById('slnt').value
+            };
+
+            // Aplicar CSS
+            for (let key in vals) {
+                document.documentElement.style.setProperty(`--${key}`, vals[key]);
+                document.getElementById(`v-${key}`).innerText = vals[key];
+            }
+
+            // Actualizar Gráfico (Normalizando valores para que el radar se vea bien)
+            fontChart.data.datasets[0].data = [
+                vals.wght / 10,
+                vals.wdth,
+                vals.ROND,
+                (vals.GRAD + 200) / 3.5,
+                vals.opsz,
+                Math.abs(vals.slnt) * 10
+            ];
+            fontChart.update();
+
+            // Actualizar Código
+            document.getElementById('css-code').innerText = `font-variation-settings: 'wght' ${vals.wght}, 'wdth' ${vals.wdth}, 'ROND' ${vals.ROND}, 'GRAD' ${vals.GRAD}, 'opsz' ${vals.opsz}, 'slnt' ${vals.slnt};`;
         }
+
+        inputs.forEach(i => i.addEventListener('input', updateAll));
+        updateAll(); // Primera carga
     </script>
 </body>
 </html>
