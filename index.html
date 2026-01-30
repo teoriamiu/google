@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sans Flex: Lab Corregido</title>
+    <style>
+        /* 1. RUTA ACTUALIZADA AL MISMO NIVEL DEL INDEX */
+        @font-face {
+            font-family: 'Google Sans Flex';
+            /* Hemos quitado 'fonts/' y simplificado el nombre */
+            src: url('GoogleSansFlex.ttf') format('truetype');
+            font-weight: 100 1000;
+            font-stretch: 25% 151%;
+        }
+
+        :root {
+            --bg: #0b0e14;
+            --card-bg: #161b22;
+            --accent: #4285f4;
+            --wght: 400;
+            --wdth: 100;
+            --ROND: 0;
+            --GRAD: 0;
+        }
+
+        body {
+            font-family: 'Google Sans Flex', sans-serif;
+            background-color: var(--bg);
+            color: #e6edf3;
+            margin: 0;
+            padding: 2vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .loading { background: #3b3102; color: #ffdf5d; }
+        .success { background: #1a7f37; color: #ffffff; }
+        .error { background: #cf222e; color: #ffffff; }
+
+        .preview-box {
+            background: var(--card-bg);
+            padding: 60px 20px;
+            border-radius: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #30363d;
+            width: 100%;
+            max-width: 860px;
+        }
+
+        #main-demo {
+            font-size: clamp(2rem, 10vw, 6rem);
+            font-variation-settings: 
+                'wght' var(--wght), 
+                'wdth' var(--wdth), 
+                'ROND' var(--ROND), 
+                'GRAD' var(--GRAD);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid #30363d;
+            width: 100%;
+            max-width: 860px;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 10px; }
+        label { font-size: 0.8rem; color: #8b949e; display: flex; justify-content: space-between; }
+        input[type="range"] { width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="status-badge" class="loading">Comprobando archivo...</div>
+
+    <div class="preview-box">
+        <div id="main-demo">Testing</div>
+    </div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Peso (wght): <span id="val-wght">400</span></label>
+            <input type="range" id="wght" min="100" max="1000" value="400">
+        </div>
+        <div class="control-group">
+            <label>Ancho (wdth): <span id="val-wdth">100</span></label>
+            <input type="range" id="wdth" min="25" max="151" value="100">
+        </div>
+        <div class="control-group">
+            <label>Redondez (ROND): <span id="val-ROND">0</span></label>
+            <input type="range" id="ROND" min="0" max="100" value="0">
+        </div>
+        <div class="control-group">
+            <label>Grado (GRAD): <span id="val-GRAD">0</span></label>
+            <input type="range" id="GRAD" min="-200" max="150" value="0">
+        </div>
+    </div>
+
+    <script>
+        const badge = document.getElementById('status-badge');
+        
+        // Verificación forzada tras un pequeño delay para dar tiempo al render
+        setTimeout(() => {
+            if (document.fonts.check('1em "Google Sans Flex"')) {
+                badge.textContent = "✅ GoogleSansFlex.ttf cargada correctamente";
+                badge.className = "success";
+            } else {
+                badge.textContent = "❌ No se encontró 'GoogleSansFlex.ttf' en la raíz";
+                badge.className = "error";
+            }
+        }, 500);
+
+        const inputs = document.querySelectorAll('input[type="range"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+                const id = e.target.id;
+                document.documentElement.style.setProperty(`--${id}`, val);
+                document.getElementById(`val-${id}`).textContent = val;
+            });
+        });
+    </script>
+</body>
+</html>
