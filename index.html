@@ -5,29 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sans Flex: Studio Pro</title>
     
-    <script src="./js/sortable/sortable.min.js"></script>
-    <script src="./js/chart/chart.min.js"></script>
+    <script src="/js/sortable/sortable.min.js"></script>
     
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            src: url('./fonts/GoogleSansFlex.ttf') format('truetype');
+            src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
         }
 
         :root {
             --wght: 400; --wdth: 100; --opsz: 14; --GRAD: 0; --slnt: 0; --ROND: 0;
-            /* Paleta Monocromática de Sistema */
             --bg: #ffffff; 
             --panel: #f8f9fa; 
             --text: #202124;
             --border: #dadce0;
             --card-hover: #f1f3f4;
-            /* Colores Google */
             --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
         }
 
-        /* Soporte para Modo Oscuro de Sistema */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #000000; --panel: #111111; --text: #e8eaed; --border: #3c4043; --card-hover: #202124;
@@ -41,7 +37,6 @@
             transition: background 0.3s ease;
         }
 
-        /* --- SIDEBAR MONOCROMO --- */
         .sidebar {
             width: 320px; background: var(--panel);
             padding: 24px; border-right: 1px solid var(--border);
@@ -66,7 +61,6 @@
             background: var(--border); height: 2px; border-radius: 2px;
         }
 
-        /* --- MAIN CANVAS --- */
         .main-content {
             flex: 1; display: flex; flex-direction: column; position: relative;
         }
@@ -76,7 +70,6 @@
             text-align: center; padding: 20px;
         }
 
-        /* LÓGICA DE COLORES GOOGLE */
         #main-text {
             font-size: clamp(3rem, 10vw, 8rem);
             font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
@@ -86,20 +79,10 @@
         .g-b { color: var(--g-blue); }   .g-r { color: var(--g-red); }
         .g-y { color: var(--g-yellow); } .g-g { color: var(--g-green); }
 
-        /* FOOTER / GRÁFICO */
-        .analysis-box {
-            height: 220px; border-top: 1px solid var(--border);
-            display: flex; justify-content: center; align-items: center; padding: 20px;
-            background: var(--panel);
-        }
-        .charts-container { width: 100%; max-width: 300px; height: 180px; }
-
-        /* --- RESPONSIVE MOBILE --- */
         @media (max-width: 800px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
             .sidebar { width: auto; border-right: none; border-top: 1px solid var(--border); order: 2; height: auto; }
             .main-content { height: 60vh; order: 1; }
-            .analysis-box { order: 3; border-top: 1px solid var(--border); }
             #main-text { font-size: 15vw; }
         }
     </style>
@@ -143,46 +126,17 @@
                 <div style="color: var(--text); font-size: 0.5em; opacity: 0.5;">Sans Flex</div>
             </div>
         </div>
-        
-        <div class="analysis-box">
-            <div class="charts-container">
-                <canvas id="fontChart"></canvas>
-            </div>
-        </div>
     </main>
 
     <script>
         window.onload = () => {
-            // Sortable Config
+            // Sortable con delay de 200ms
             if (typeof Sortable !== 'undefined') {
                 Sortable.create(document.getElementById('controls-list'), { 
                     animation: 250,
-                    ghostClass: 'sortable-ghost'
-                });
-            }
-
-            // Chart Config (Doughnut Monocromo)
-            let myChart;
-            if (typeof Chart !== 'undefined') {
-                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const chartColor = isDark ? '#ffffff' : '#000000';
-                
-                const ctx = document.getElementById('fontChart').getContext('2d');
-                myChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['W', 'Wd', 'R', 'G', 'O', 'S'],
-                        datasets: [{
-                            data: [400, 100, 1, 1, 14, 1],
-                            backgroundColor: [chartColor, '#808080', '#404040', '#A0A0A0', '#606060', '#C0C0C0'],
-                            borderWidth: 0,
-                            cutout: '85%'
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
+                    ghostClass: 'sortable-ghost',
+                    delay: 200,
+                    delayOnTouchOnly: true
                 });
             }
 
@@ -193,12 +147,6 @@
                     const id = e.target.id;
                     document.documentElement.style.setProperty(`--${id}`, val);
                     document.getElementById(`v-${id}`).innerText = val;
-
-                    if (myChart) {
-                        const idx = { 'wght': 0, 'wdth': 1, 'ROND': 2, 'GRAD': 3, 'opsz': 4, 'slnt': 5 };
-                        myChart.data.datasets[0].data[idx[id]] = Math.abs(parseFloat(val)) || 1;
-                        myChart.update('none');
-                    }
                 };
             });
         };
