@@ -2,136 +2,141 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sans Flex: Lab Corregido</title>
+    <title>Google Sans Flex: Verificación Real</title>
     <style>
-        /* 1. RUTA ACTUALIZADA AL MISMO NIVEL DEL INDEX */
         @font-face {
             font-family: 'Google Sans Flex';
-            /* Hemos quitado 'fonts/' y simplificado el nombre */
-            src: url('GoogleSansFlex.ttf') format('truetype');
+            src: url('./GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
             font-stretch: 25% 151%;
         }
 
         :root {
-            --bg: #0b0e14;
-            --card-bg: #161b22;
-            --accent: #4285f4;
-            --wght: 400;
-            --wdth: 100;
-            --ROND: 0;
-            --GRAD: 0;
+            --wght: 400; --wdth: 100; --ROND: 0; --GRAD: 0;
+            --bg: #050505; --accent: #4285f4;
         }
 
         body {
-            font-family: 'Google Sans Flex', sans-serif;
-            background-color: var(--bg);
-            color: #e6edf3;
+            font-family: 'Google Sans Flex', Arial, sans-serif;
+            background: var(--bg);
+            color: white;
             margin: 0;
-            padding: 2vw;
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
 
-        #status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            font-weight: 700;
+        /* Indicador visual de estado */
+        #status-box {
+            position: fixed;
+            top: 20px;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .loading { background: #3b3102; color: #ffdf5d; }
-        .success { background: #1a7f37; color: #ffffff; }
-        .error { background: #cf222e; color: #ffffff; }
 
-        .preview-box {
-            background: var(--card-bg);
-            padding: 60px 20px;
-            border-radius: 24px;
+        #main-text {
+            font-size: 12vw;
             text-align: center;
-            margin-bottom: 30px;
-            border: 1px solid #30363d;
-            width: 100%;
-            max-width: 860px;
-        }
-
-        #main-demo {
-            font-size: clamp(2rem, 10vw, 6rem);
             font-variation-settings: 
-                'wght' var(--wght), 
-                'wdth' var(--wdth), 
-                'ROND' var(--ROND), 
-                'GRAD' var(--GRAD);
+                'wght' var(--wght), 'wdth' var(--wdth), 
+                'ROND' var(--ROND), 'GRAD' var(--GRAD);
+            user-select: none;
         }
 
         .controls {
+            margin-top: 50px;
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 24px;
-            border: 1px solid #30363d;
-            width: 100%;
-            max-width: 860px;
         }
 
-        .control-group { display: flex; flex-direction: column; gap: 10px; }
-        label { font-size: 0.8rem; color: #8b949e; display: flex; justify-content: space-between; }
-        input[type="range"] { width: 100%; cursor: pointer; }
+        .ctrl-group { display: flex; flex-direction: column; gap: 5px; }
+        label { color: #888; font-size: 11px; font-weight: bold; }
+        input { width: 160px; accent-color: var(--accent); cursor: pointer; }
+        
+        /* Regla para medir el ancho (invisible para el usuario) */
+        #font-tester {
+            position: absolute;
+            visibility: hidden;
+            height: auto;
+            width: auto;
+            white-space: nowrap;
+            font-family: 'Google Sans Flex';
+            font-size: 100px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="status-badge" class="loading">Comprobando archivo...</div>
+    <div id="status-box">Verificando...</div>
+    
+    <div id="main-text" contenteditable="true">G FLEX</div>
 
-    <div class="preview-box">
-        <div id="main-demo">Testing</div>
-    </div>
+    <div id="font-tester" style="font-variation-settings: 'wdth' 151;">MMMMMMMMMM</div>
 
     <div class="controls">
-        <div class="control-group">
-            <label>Peso (wght): <span id="val-wght">400</span></label>
+        <div class="ctrl-group">
+            <label>PESO (wght): <span id="v-wght">400</span></label>
             <input type="range" id="wght" min="100" max="1000" value="400">
         </div>
-        <div class="control-group">
-            <label>Ancho (wdth): <span id="val-wdth">100</span></label>
+        <div class="ctrl-group">
+            <label>ANCHO (wdth): <span id="v-wdth">100</span></label>
             <input type="range" id="wdth" min="25" max="151" value="100">
         </div>
-        <div class="control-group">
-            <label>Redondez (ROND): <span id="val-ROND">0</span></label>
+        <div class="ctrl-group">
+            <label>REDONDEZ (ROND): <span id="v-ROND">0</span></label>
             <input type="range" id="ROND" min="0" max="100" value="0">
         </div>
-        <div class="control-group">
-            <label>Grado (GRAD): <span id="val-GRAD">0</span></label>
+        <div class="ctrl-group">
+            <label>GRADO (GRAD): <span id="v-GRAD">0</span></label>
             <input type="range" id="GRAD" min="-200" max="150" value="0">
         </div>
     </div>
 
     <script>
-        const badge = document.getElementById('status-badge');
-        
-        // Verificación forzada tras un pequeño delay para dar tiempo al render
-        setTimeout(() => {
-            if (document.fonts.check('1em "Google Sans Flex"')) {
-                badge.textContent = "✅ GoogleSansFlex.ttf cargada correctamente";
-                badge.className = "success";
-            } else {
-                badge.textContent = "❌ No se encontró 'GoogleSansFlex.ttf' en la raíz";
-                badge.className = "error";
-            }
-        }, 500);
+        const tester = document.getElementById('font-tester');
+        const statusBox = document.getElementById('status-box');
 
-        const inputs = document.querySelectorAll('input[type="range"]');
-        inputs.forEach(input => {
-            input.addEventListener('input', (e) => {
-                const val = e.target.value;
-                const id = e.target.id;
-                document.documentElement.style.setProperty(`--${id}`, val);
-                document.getElementById(`val-${id}`).textContent = val;
-            });
+        function verifyFont() {
+            // Medimos el ancho de 10 'M's con el eje wdth al máximo
+            const width = tester.offsetWidth;
+            
+            // Si la fuente es Arial o genérica, el ancho será fijo (aprox 1100-1200px)
+            // Si es Google Sans Flex en wdth 151, el ancho será notablemente mayor (aprox 1500px+)
+            // Usamos un umbral para detectar la expansión real del eje variable
+            if (width > 1350) {
+                statusBox.style.background = "#1a7f37";
+                statusBox.style.color = "white";
+                statusBox.textContent = "✅ CARGADA: Google Sans Flex Detectada";
+            } else {
+                statusBox.style.background = "#cf222e";
+                statusBox.style.color = "white";
+                statusBox.textContent = "❌ ERROR: Fuente no detectada (Usando Arial/System)";
+            }
+        }
+
+        // Ejecutar verificación con un pequeño delay para que el motor de render actúe
+        window.onload = () => {
+            setTimeout(verifyFont, 500);
+        };
+
+        // Lógica de Sliders
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => {
+            i.oninput = () => {
+                document.documentElement.style.setProperty(`--${i.id}`, i.value);
+                document.getElementById(`v-${i.id}`).innerText = i.value;
+            };
         });
     </script>
 </body>
