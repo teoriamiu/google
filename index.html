@@ -119,7 +119,7 @@
             if (typeof Chart !== 'undefined') {
                 const ctx = document.getElementById('fontChart').getContext('2d');
                 window.myChart = new Chart(ctx, {
-                    type: 'radar',
+                    type: 'doughnut',
                     data: {
                         labels: ['Weight', 'Width', 'Round', 'Grade', 'Optical', 'Slant'],
                         datasets: [{
