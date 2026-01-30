@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sans Flex: Studio Pro</title>
     
-    <script src="/js/sortable/sortable.min.js"></script>
+    <script src="./js/sortable/sortable.min.js"></script>
     
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
+            src: url('./fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
         }
 
@@ -21,12 +21,15 @@
             --text: #202124;
             --border: #dadce0;
             --card-hover: #f1f3f4;
+            --code-bg: #202124;
+            --code-text: #e8eaed;
             --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: #000000; --panel: #111111; --text: #e8eaed; --border: #3c4043; --card-hover: #202124;
+                --code-bg: #111111;
             }
         }
 
@@ -37,6 +40,7 @@
             transition: background 0.3s ease;
         }
 
+        /* --- SIDEBAR --- */
         .sidebar {
             width: 320px; background: var(--panel);
             padding: 24px; border-right: 1px solid var(--border);
@@ -52,6 +56,7 @@
             transition: all 0.2s ease;
         }
         .control-card:hover { background: var(--card-hover); border-color: var(--text); }
+        .sortable-ghost { opacity: 0.4; background: var(--border); }
         
         .label-row { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 8px; font-weight: 800; color: var(--text); opacity: 0.6; }
         .val { color: var(--text); opacity: 1; }
@@ -61,6 +66,7 @@
             background: var(--border); height: 2px; border-radius: 2px;
         }
 
+        /* --- MAIN CONTENT --- */
         .main-content {
             flex: 1; display: flex; flex-direction: column; position: relative;
         }
@@ -79,10 +85,55 @@
         .g-b { color: var(--g-blue); }   .g-r { color: var(--g-red); }
         .g-y { color: var(--g-yellow); } .g-g { color: var(--g-green); }
 
+        /* --- CODE BOX --- */
+        .code-explorer {
+            padding: 24px;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-header span { font-size: 0.7rem; font-weight: 800; opacity: 0.5; text-transform: uppercase; }
+
+        .code-display {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            position: relative;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .copy-btn:hover { opacity: 0.8; }
+
         @media (max-width: 800px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
             .sidebar { width: auto; border-right: none; border-top: 1px solid var(--border); order: 2; height: auto; }
-            .main-content { height: 60vh; order: 1; }
+            .main-content { height: 50vh; order: 1; }
+            .code-explorer { order: 3; }
             #main-text { font-size: 15vw; }
         }
     </style>
@@ -126,11 +177,24 @@
                 <div style="color: var(--text); font-size: 0.5em; opacity: 0.5;">Sans Flex</div>
             </div>
         </div>
+
+        <section class="code-explorer">
+            <div class="code-header">
+                <span>CSS Variation Settings</span>
+                <button class="copy-btn" id="copy-btn">COPY CSS</button>
+            </div>
+            <div class="code-display" id="css-output">
+                font-variation-settings: 'wght' 400, 'wdth' 100, 'opsz' 14, 'GRAD' 0, 'slnt' 0, 'ROND' 0;
+            </div>
+        </section>
     </main>
 
     <script>
         window.onload = () => {
-            // Sortable con delay de 200ms
+            const cssOutput = document.getElementById('css-output');
+            const copyBtn = document.getElementById('copy-btn');
+
+            // Sortable Initialization
             if (typeof Sortable !== 'undefined') {
                 Sortable.create(document.getElementById('controls-list'), { 
                     animation: 250,
@@ -140,15 +204,42 @@
                 });
             }
 
-            // Sliders Logic
+            // Update Function
+            const updateUI = () => {
+                const values = {
+                    wght: document.getElementById('wght').value,
+                    wdth: document.getElementById('wdth').value,
+                    opsz: document.getElementById('opsz').value,
+                    GRAD: document.getElementById('GRAD').value,
+                    slnt: document.getElementById('slnt').value,
+                    ROND: document.getElementById('ROND').value
+                };
+
+                // Generate CSS string
+                const cssString = `font-variation-settings: 'wght' ${values.wght}, 'wdth' ${values.wdth}, 'opsz' ${values.opsz}, 'GRAD' ${values.GRAD}, 'slnt' ${values.slnt}, 'ROND' ${values.ROND};`;
+                
+                cssOutput.innerText = cssString;
+            };
+
+            // Sliders Events
             document.querySelectorAll('input').forEach(input => {
                 input.oninput = (e) => {
                     const val = e.target.value;
                     const id = e.target.id;
                     document.documentElement.style.setProperty(`--${id}`, val);
                     document.getElementById(`v-${id}`).innerText = val;
+                    updateUI();
                 };
             });
+
+            // Copy to Clipboard
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(cssOutput.innerText).then(() => {
+                    const originalText = copyBtn.innerText;
+                    copyBtn.innerText = "COPIED!";
+                    setTimeout(() => copyBtn.innerText = originalText, 2000);
+                });
+            };
         };
     </script>
 </body>
