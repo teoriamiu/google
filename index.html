@@ -153,7 +153,7 @@
             // Sortable
             const el = document.getElementById('controls-list');
             if (typeof Sortable !== 'undefined') {
-                Sortable.create(el, { animation: 150 });
+                Sortable.create(el, { animation: 150, delay: 200});
             }
 
             // Chart Doughnut
@@ -168,7 +168,7 @@
                             data: [400, 100, 1, 1, 14, 1],
                             backgroundColor: ['#58a6ff', '#3fb950', '#d29922', '#f85149', '#8b949e', '#db61a2'],
                             borderWidth: 0,
-                            cutout: '80%'
+                            cutout: '20%'
                         }]
                     },
                     options: {
