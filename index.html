@@ -16,13 +16,9 @@
 
         :root {
             --wght: 400; --wdth: 100; --opsz: 14; --GRAD: 0; --slnt: 0; --ROND: 0;
-            --bg: #ffffff; 
-            --panel: #f8f9fa; 
-            --text: #202124;
-            --border: #dadce0;
-            --card-hover: #f1f3f4;
-            --code-bg: #202124;
-            --code-text: #e8eaed;
+            --bg: #ffffff; --panel: #f8f9fa; --text: #202124;
+            --border: #dadce0; --card-hover: #f1f3f4;
+            --code-bg: #202124; --code-text: #e8eaed;
             --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
         }
 
@@ -37,10 +33,9 @@
             font-family: 'GSansFlex', sans-serif;
             background: var(--bg); color: var(--text);
             margin: 0; display: flex; height: 100vh; overflow: hidden;
-            transition: background 0.3s ease;
         }
 
-        /* --- SIDEBAR --- */
+        /* --- DESKTOP LAYOUT --- */
         .sidebar {
             width: 320px; background: var(--panel);
             padding: 24px; border-right: 1px solid var(--border);
@@ -48,100 +43,73 @@
             overflow-y: auto; z-index: 100;
         }
 
-        h3 { font-size: 1rem; margin: 0 0 10px; font-weight: 700; letter-spacing: -0.02em; }
-
-        .control-card {
-            background: var(--bg); padding: 14px; border-radius: 12px;
-            border: 1px solid var(--border); cursor: grab;
-            transition: all 0.2s ease;
-        }
-        .control-card:hover { background: var(--card-hover); border-color: var(--text); }
-        .sortable-ghost { opacity: 0.4; background: var(--border); }
-        
-        .label-row { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 8px; font-weight: 800; color: var(--text); opacity: 0.6; }
-        .val { color: var(--text); opacity: 1; }
-
-        input[type="range"] { 
-            width: 100%; accent-color: var(--text); -webkit-appearance: none; 
-            background: var(--border); height: 2px; border-radius: 2px;
-        }
-
-        /* --- MAIN CONTENT --- */
         .main-content {
-            flex: 1; display: flex; flex-direction: column; position: relative;
+            flex: 1; display: flex; flex-direction: column; overflow-y: auto;
         }
 
         .preview-container {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            text-align: center; padding: 20px;
+            flex: 1; min-height: 300px; display: flex; align-items: center; 
+            justify-content: center; text-align: center; padding: 40px;
+            background: var(--bg);
         }
 
         #main-text {
             font-size: clamp(3rem, 10vw, 8rem);
             font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
-            outline: none; line-height: 1;
+            outline: none; line-height: 1.1;
         }
 
-        .g-b { color: var(--g-blue); }   .g-r { color: var(--g-red); }
+        /* Colores Google */
+        .g-b { color: var(--g-blue); } .g-r { color: var(--g-red); }
         .g-y { color: var(--g-yellow); } .g-g { color: var(--g-green); }
+
+        /* --- CONTROLES --- */
+        .control-card {
+            background: var(--bg); padding: 14px; border-radius: 12px;
+            border: 1px solid var(--border); cursor: grab; margin-bottom: 10px;
+        }
+        .label-row { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; opacity: 0.6; margin-bottom: 8px; }
+        input[type="range"] { width: 100%; accent-color: var(--text); }
 
         /* --- CODE BOX --- */
         .code-explorer {
-            padding: 24px;
-            background: var(--panel);
-            border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            padding: 24px; background: var(--panel); border-top: 1px solid var(--border);
         }
-
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .code-header span { font-size: 0.7rem; font-weight: 800; opacity: 0.5; text-transform: uppercase; }
-
         .code-display {
-            background: var(--code-bg);
-            color: var(--code-text);
-            padding: 16px;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            position: relative;
-            border: 1px solid var(--border);
-            overflow-x: auto;
-            white-space: nowrap;
+            background: var(--code-bg); color: var(--code-text); padding: 16px;
+            border-radius: 8px; font-family: monospace; font-size: 0.8rem;
+            margin-top: 10px; border: 1px solid var(--border); overflow-x: auto;
         }
 
-        .copy-btn {
-            background: var(--text);
-            color: var(--bg);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        .copy-btn:hover { opacity: 0.8; }
+        /* --- ESTRATEGIA RESPONSIVE MÓVIL --- */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow: hidden; } /* Evita scroll en el body */
 
-        @media (max-width: 800px) {
-            body { flex-direction: column; overflow-y: auto; height: auto; }
-            .sidebar { width: auto; border-right: none; border-top: 1px solid var(--border); order: 2; height: auto; }
-            .main-content { height: 50vh; order: 1; }
-            .code-explorer { order: 3; }
-            #main-text { font-size: 15vw; }
+            /* Título FIJO arriba */
+            .preview-container {
+                flex: none; height: 40vh; position: sticky; top: 0;
+                z-index: 200; border-bottom: 1px solid var(--border);
+                background: var(--bg);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            }
+            #main-text { font-size: 12vw; }
+
+            /* Contenido SCROLLABLE debajo */
+            .main-content { flex: 1; overflow-y: auto; }
+            
+            .sidebar { 
+                width: auto; border-right: none; height: auto; 
+                overflow-y: visible; padding: 20px;
+            }
+            
+            .code-explorer { border-top: 1px solid var(--border); }
         }
     </style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <h3>System Axes</h3>
+    <aside class="sidebar" id="sidebar-panel">
+        <h3 style="font-size: 0.9rem; opacity: 0.5;">CONTROLES</h3>
         <div id="controls-list">
             <div class="control-card" data-id="wght">
                 <div class="label-row"><span>WEIGHT</span> <span class="val" id="v-wght">400</span></div>
@@ -174,14 +142,14 @@
         <div class="preview-container">
             <div id="main-text" contenteditable="true" spellcheck="false">
                 <span class="g-b">G</span><span class="g-r">o</span><span class="g-y">o</span><span class="g-b">g</span><span class="g-g">l</span><span class="g-r">e</span>
-                <div style="color: var(--text); font-size: 0.5em; opacity: 0.5;">Sans Flex</div>
+                <div style="color: var(--text); font-size: 0.4em; opacity: 0.4;">Sans Flex</div>
             </div>
         </div>
 
         <section class="code-explorer">
-            <div class="code-header">
-                <span>CSS Variation Settings</span>
-                <button class="copy-btn" id="copy-btn">COPY CSS</button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.7rem; font-weight: 800; opacity: 0.5;">CSS OUTPUT</span>
+                <button id="copy-btn" style="background: var(--text); color: var(--bg); border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 700; cursor: pointer;">COPY</button>
             </div>
             <div class="code-display" id="css-output">
                 font-variation-settings: 'wght' 400, 'wdth' 100, 'opsz' 14, 'GRAD' 0, 'slnt' 0, 'ROND' 0;
@@ -192,53 +160,36 @@
     <script>
         window.onload = () => {
             const cssOutput = document.getElementById('css-output');
-            const copyBtn = document.getElementById('copy-btn');
-
-            // Sortable Initialization
+            
+            // Sortable
             if (typeof Sortable !== 'undefined') {
                 Sortable.create(document.getElementById('controls-list'), { 
                     animation: 250,
-                    ghostClass: 'sortable-ghost',
-                    delay: 200,
+                    delay: 150,
                     delayOnTouchOnly: true
                 });
             }
 
-            // Update Function
-            const updateUI = () => {
-                const values = {
-                    wght: document.getElementById('wght').value,
-                    wdth: document.getElementById('wdth').value,
-                    opsz: document.getElementById('opsz').value,
-                    GRAD: document.getElementById('GRAD').value,
-                    slnt: document.getElementById('slnt').value,
-                    ROND: document.getElementById('ROND').value
-                };
-
-                // Generate CSS string
-                const cssString = `font-variation-settings: 'wght' ${values.wght}, 'wdth' ${values.wdth}, 'opsz' ${values.opsz}, 'GRAD' ${values.GRAD}, 'slnt' ${values.slnt}, 'ROND' ${values.ROND};`;
-                
-                cssOutput.innerText = cssString;
+            const updateCSS = () => {
+                const axes = ['wght', 'wdth', 'opsz', 'GRAD', 'slnt', 'ROND'];
+                const settings = axes.map(ax => `'${ax}' ${document.getElementById(ax).value}`).join(', ');
+                cssOutput.innerText = `font-variation-settings: ${settings};`;
             };
 
-            // Sliders Events
             document.querySelectorAll('input').forEach(input => {
                 input.oninput = (e) => {
                     const val = e.target.value;
                     const id = e.target.id;
                     document.documentElement.style.setProperty(`--${id}`, val);
                     document.getElementById(`v-${id}`).innerText = val;
-                    updateUI();
+                    updateCSS();
                 };
             });
 
-            // Copy to Clipboard
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(cssOutput.innerText).then(() => {
-                    const originalText = copyBtn.innerText;
-                    copyBtn.innerText = "COPIED!";
-                    setTimeout(() => copyBtn.innerText = originalText, 2000);
-                });
+            document.getElementById('copy-btn').onclick = function() {
+                navigator.clipboard.writeText(cssOutput.innerText);
+                this.innerText = "COPIED!";
+                setTimeout(() => this.innerText = "COPY", 2000);
             };
         };
     </script>
