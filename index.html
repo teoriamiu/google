@@ -5,215 +5,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sans Flex: Studio Pro</title>
     
-    <script src="/js/sortable/sortable.min.js"></script>
-    <script src="/js/chart/chart.min.js"></script>
+    <script src="./js/sortable/sortable.min.js"></script>
+    <script src="./js/chart/chart.min.js"></script>
     
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
+            src: url('./fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
         }
 
         :root {
             --wght: 400; --wdth: 100; --opsz: 14; --GRAD: 0; --slnt: 0; --ROND: 0;
-            --bg: #09090b; --panel: #121214; --accent: #3b82f6; --card-bg: #1c1c1f;
+            /* Paleta Monocromática de Sistema */
+            --bg: #ffffff; 
+            --panel: #f8f9fa; 
+            --text: #202124;
+            --border: #dadce0;
+            --card-hover: #f1f3f4;
+            /* Colores Google */
+            --g-blue: #4285F4; --g-red: #EA4335; --g-yellow: #FBBC05; --g-green: #34A853;
+        }
+
+        /* Soporte para Modo Oscuro de Sistema */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #000000; --panel: #111111; --text: #e8eaed; --border: #3c4043; --card-hover: #202124;
+            }
         }
 
         body {
-            font-family: 'GSansFlex', -apple-system, sans-serif;
-            background: var(--bg); color: #e4e4e7;
+            font-family: 'GSansFlex', sans-serif;
+            background: var(--bg); color: var(--text);
             margin: 0; display: flex; height: 100vh; overflow: hidden;
+            transition: background 0.3s ease;
         }
 
-        /* --- SIDEBAR PRO --- */
+        /* --- SIDEBAR MONOCROMO --- */
         .sidebar {
-            width: 340px; background: var(--panel);
-            padding: 24px; border-right: 1px solid #27272a;
-            display: flex; flex-direction: column; gap: 20px;
-            overflow-y: auto; scrollbar-width: none;
+            width: 320px; background: var(--panel);
+            padding: 24px; border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; gap: 15px;
+            overflow-y: auto; z-index: 100;
         }
-        .sidebar::-webkit-scrollbar { display: none; }
 
-        .header { margin-bottom: 10px; }
-        .header h3 { margin: 0; font-weight: 600; font-size: 1.1rem; letter-spacing: -0.02em; }
-        .header p { font-size: 0.75rem; color: #71717a; margin: 4px 0 0; }
+        h3 { font-size: 1rem; margin: 0 0 10px; font-weight: 700; letter-spacing: -0.02em; }
 
-        /* SORTABLE CARDS */
         .control-card {
-            background: var(--card-bg); padding: 16px; border-radius: 14px;
-            margin-bottom: 12px; cursor: grab; border: 1px solid #27272a;
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            background: var(--bg); padding: 14px; border-radius: 12px;
+            border: 1px solid var(--border); cursor: grab;
+            transition: all 0.2s ease;
         }
-        .control-card:hover { border-color: #3f3f46; }
-        .control-card:active { cursor: grabbing; }
-
-        /* Estilos Sortable */
-        .sortable-ghost { opacity: 0.3; transform: scale(0.95); background: #27272a; }
-        .sortable-chosen { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); border-color: var(--accent) !important; transform: scale(1.02); }
-
-        .label-row { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 12px; font-weight: 700; color: #a1a1aa; text-transform: uppercase; }
-        .val { color: var(--accent); background: rgba(59, 130, 246, 0.1); padding: 2px 8px; border-radius: 4px; }
+        .control-card:hover { background: var(--card-hover); border-color: var(--text); }
         
+        .label-row { display: flex; justify-content: space-between; font-size: 0.7rem; margin-bottom: 8px; font-weight: 800; color: var(--text); opacity: 0.6; }
+        .val { color: var(--text); opacity: 1; }
+
         input[type="range"] { 
-            width: 100%; height: 4px; border-radius: 2px;
-            accent-color: var(--accent); -webkit-appearance: none; background: #27272a;
+            width: 100%; accent-color: var(--text); -webkit-appearance: none; 
+            background: var(--border); height: 2px; border-radius: 2px;
         }
 
         /* --- MAIN CANVAS --- */
         .main-content {
-            flex: 1; display: flex; flex-direction: column;
-            position: relative; background-image: radial-gradient(#27272a 1px, transparent 1px);
-            background-size: 32px 32px; /* Efecto de cuadrícula de diseño */
+            flex: 1; display: flex; flex-direction: column; position: relative;
         }
 
         .preview-container {
             flex: 1; display: flex; align-items: center; justify-content: center;
-            padding: 40px;
+            text-align: center; padding: 20px;
         }
 
-        #preview-text {
-            width: 100%; font-size: clamp(3rem, 12vw, 10rem);
-            text-align: center; outline: none; border: none; background: transparent;
+        /* LÓGICA DE COLORES GOOGLE */
+        #main-text {
+            font-size: clamp(3rem, 10vw, 8rem);
             font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
-            transition: font-variation-settings 0.15s ease-out;
-            color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            outline: none; line-height: 1;
         }
 
-        /* FOOTER CHART */
-        .footer-analysis {
-            height: 280px; background: rgba(18, 18, 20, 0.8);
-            backdrop-filter: blur(12px); border-top: 1px solid #27272a;
-            padding: 20px; display: flex; flex-direction: column; align-items: center;
+        .g-b { color: var(--g-blue); }   .g-r { color: var(--g-red); }
+        .g-y { color: var(--g-yellow); } .g-g { color: var(--g-green); }
+
+        /* FOOTER / GRÁFICO */
+        .analysis-box {
+            height: 220px; border-top: 1px solid var(--border);
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            background: var(--panel);
         }
+        .charts-container { width: 100%; max-width: 300px; height: 180px; }
 
-        .charts-container { width: 100%; max-width: 400px; height: 100%; }
-
-        /* --- RESPONSIVE --- */
-        @media (max-width: 900px) {
-            body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: auto; border-right: none; border-top: 1px solid #27272a; order: 2; }
-            .main-content { height: 70vh; order: 1; }
+        /* --- RESPONSIVE MOBILE --- */
+        @media (max-width: 800px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar { width: auto; border-right: none; border-top: 1px solid var(--border); order: 2; height: auto; }
+            .main-content { height: 60vh; order: 1; }
+            .analysis-box { order: 3; border-top: 1px solid var(--border); }
+            #main-text { font-size: 15vw; }
         }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="header">
-            <h3>Type Specimen</h3>
-            <p>Drag to reorder axes · Click text to edit</p>
-        </div>
-        
+        <h3>System Axes</h3>
         <div id="controls-list">
             <div class="control-card" data-id="wght">
-                <div class="label-row"><span>Weight</span> <span class="val" id="v-wght">400</span></div>
+                <div class="label-row"><span>WEIGHT</span> <span class="val" id="v-wght">400</span></div>
                 <input type="range" id="wght" min="100" max="1000" value="400">
             </div>
             <div class="control-card" data-id="wdth">
-                <div class="label-row"><span>Width</span> <span class="val" id="v-wdth">100</span></div>
+                <div class="label-row"><span>WIDTH</span> <span class="val" id="v-wdth">100</span></div>
                 <input type="range" id="wdth" min="25" max="151" value="100">
             </div>
-            <div class="control-card" data-id="opsz">
-                <div class="label-row"><span>Optical Size</span> <span class="val" id="v-opsz">14</span></div>
-                <input type="range" id="opsz" min="8" max="144" value="14">
-            </div>
             <div class="control-card" data-id="ROND">
-                <div class="label-row"><span>Roundness</span> <span class="val" id="v-ROND">0</span></div>
+                <div class="label-row"><span>ROUND</span> <span class="val" id="v-ROND">0</span></div>
                 <input type="range" id="ROND" min="0" max="100" value="0">
             </div>
             <div class="control-card" data-id="GRAD">
-                <div class="label-row"><span>Grade</span> <span class="val" id="v-GRAD">0</span></div>
+                <div class="label-row"><span>GRADE</span> <span class="val" id="v-GRAD">0</span></div>
                 <input type="range" id="GRAD" min="-200" max="150" value="0">
             </div>
+            <div class="control-card" data-id="opsz">
+                <div class="label-row"><span>OPTICAL</span> <span class="val" id="v-opsz">14</span></div>
+                <input type="range" id="opsz" min="8" max="144" value="14">
+            </div>
             <div class="control-card" data-id="slnt">
-                <div class="label-row"><span>Slant</span> <span class="val" id="v-slnt">0</span></div>
+                <div class="label-row"><span>SLANT</span> <span class="val" id="v-slnt">0</span></div>
                 <input type="range" id="slnt" min="-10" max="0" value="0">
             </div>
         </div>
     </aside>
 
     <main class="main-content">
-        <div class="charts-container">
-    <canvas id="fontChart"></canvas>
-</div>
+        <div class="preview-container">
+            <div id="main-text" contenteditable="true" spellcheck="false">
+                <span class="g-b">G</span><span class="g-r">o</span><span class="g-y">o</span><span class="g-b">g</span><span class="g-g">l</span><span class="g-r">e</span>
+                <div style="color: var(--text); font-size: 0.5em; opacity: 0.5;">Sans Flex</div>
+            </div>
+        </div>
         
-        
-        <footer class="footer-analysis">
-            <div class="preview-container">
-    <div id="preview-text" contenteditable="true" spellcheck="false">Flex Studio</div>
-</div>
-        </footer>
+        <div class="analysis-box">
+            <div class="charts-container">
+                <canvas id="fontChart"></canvas>
+            </div>
+        </div>
     </main>
 
     <script>
         window.onload = () => {
-            // Sortable con Animación Refinada
-            const el = document.getElementById('controls-list');
+            // Sortable Config
             if (typeof Sortable !== 'undefined') {
-                Sortable.create(el, { 
-                    animation: 300, 
-                    delay: 200,
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
-                    dragClass: 'sortable-drag',
-                    forceFallback: false
+                Sortable.create(document.getElementById('controls-list'), { 
+                    animation: 250,
+                    ghostClass: 'sortable-ghost'
                 });
             }
 
-            // Chart.js - Donut Minimalista
+            // Chart Config (Doughnut Monocromo)
             let myChart;
             if (typeof Chart !== 'undefined') {
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const chartColor = isDark ? '#ffffff' : '#000000';
+                
                 const ctx = document.getElementById('fontChart').getContext('2d');
                 myChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Weight', 'Width', 'Optical', 'Round', 'Grade', 'Slant'],
+                        labels: ['W', 'Wd', 'R', 'G', 'O', 'S'],
                         datasets: [{
-                            data: [400, 100, 14, 1, 1, 1],
-                            backgroundColor: [
-                                '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
-                            ],
-                            borderWidth: 8,
-                            borderColor: '#121214',
-                            hoverOffset: 15
+                            data: [400, 100, 1, 1, 14, 1],
+                            backgroundColor: [chartColor, '#808080', '#404040', '#A0A0A0', '#606060', '#C0C0C0'],
+                            borderWidth: 0,
+                            cutout: '85%'
                         }]
                     },
                     options: {
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: { color: '#a1a1aa', usePointStyle: true, font: { size: 10 } }
-                            }
-                        }
+                        plugins: { legend: { display: false } }
                     }
                 });
             }
 
-            // Lógica de Actualización
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('input', (e) => {
+            // Sliders Logic
+            document.querySelectorAll('input').forEach(input => {
+                input.oninput = (e) => {
                     const val = e.target.value;
                     const id = e.target.id;
-                    
                     document.documentElement.style.setProperty(`--${id}`, val);
                     document.getElementById(`v-${id}`).innerText = val;
 
                     if (myChart) {
-                        const idxMap = { 'wght': 0, 'wdth': 1, 'opsz': 2, 'ROND': 3, 'GRAD': 4, 'slnt': 5 };
-                        let normalizedVal = Math.abs(parseFloat(val));
-                        
-                        // Ajuste para que los segmentos del gráfico sean visibles
-                        if(id === 'wght') normalizedVal = val / 2.5;
-                        if(id === 'GRAD') normalizedVal = (normalizedVal + 200) / 4;
-                        if(id === 'slnt') normalizedVal = (normalizedVal + 1) * 10;
-
-                        myChart.data.datasets[0].data[idxMap[id]] = normalizedVal || 5;
-                        myChart.update('none'); 
+                        const idx = { 'wght': 0, 'wdth': 1, 'ROND': 2, 'GRAD': 3, 'opsz': 4, 'slnt': 5 };
+                        myChart.data.datasets[0].data[idx[id]] = Math.abs(parseFloat(val)) || 1;
+                        myChart.update('none');
                     }
-                });
+                };
             });
         };
     </script>
