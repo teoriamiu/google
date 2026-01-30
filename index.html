@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sans Flex: Dashboard Pro</title>
-    <script src="js/sortable.min.js"></script>
-    <script src="js/chart.min.js"></script>
+    <title>Google Sans Flex: Master Dashboard</title>
+    
+    <script src="./js/sortable.min.js"></script>
+    <script src="./js/chart.min.js"></script>
     
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            src: url('/fonts/GoogleSansFlex.ttf') format('truetype');
+            /* RUTA CORREGIDA: Entra a fonts/ y busca el archivo */
+            src: url('./fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
         }
 
@@ -26,55 +28,45 @@
             height: 100vh; overflow: hidden;
         }
 
-        /* SIDEBAR CON SORTABLE */
+        /* --- SIDEBAR --- */
         .sidebar {
             background: var(--panel); padding: 20px;
             border-right: 1px solid #30363d; display: flex; flex-direction: column;
         }
 
-        .sortable-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-
         .control-card {
-            background: #21262d; padding: 15px; border-radius: 8px;
-            cursor: grab; border: 1px solid transparent; transition: 0.2s;
+            background: #21262d; padding: 12px; border-radius: 8px;
+            margin-bottom: 10px; cursor: grab; border: 1px solid #30363d;
         }
-        .control-card:active { cursor: grabbing; border-color: var(--accent); }
 
-        .label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+        .label-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
         .val { color: var(--accent); font-weight: bold; }
+        input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
 
-        input[type="range"] { width: 100%; accent-color: var(--accent); }
-
-        /* PREVIEW AREA */
+        /* --- PREVIEW --- */
         .main-content {
-            display: grid; grid-template-rows: 1fr 300px; padding: 40px; gap: 20px;
+            display: grid; grid-template-rows: 1fr 250px; padding: 20px; gap: 10px;
         }
 
         #preview-text {
-            font-size: 6vw; text-align: center; align-self: center; outline: none;
+            font-size: 7vw; text-align: center; align-self: center; outline: none;
             font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
             font-optical-sizing: none;
         }
 
         .charts-container {
-            background: rgba(255,255,255,0.03); border-radius: 16px;
-            padding: 20px; display: flex; justify-content: center;
+            background: rgba(255,255,255,0.02); border-radius: 12px;
+            padding: 15px; display: flex; justify-content: center;
         }
 
-        .code-output {
-            position: fixed; bottom: 20px; right: 20px;
-            background: #000; color: #7ee787; padding: 10px 20px;
-            border-radius: 6px; font-family: monospace; font-size: 12px;
-        }
+        canvas { max-width: 100%; height: 220px !important; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <h2>Lab Console</h2>
-        <p style="font-size: 11px; opacity: 0.6;">Arrastra las tarjetas para reordenar (SortableJS)</p>
-        
-        <div id="controls-list" class="sortable-list">
+        <h3>Lab Console</h3>
+        <div id="controls-list">
             <div class="control-card" data-id="wght">
                 <div class="label-row"><span>WEIGHT</span> <span class="val" id="v-wght">400</span></div>
                 <input type="range" id="wght" min="100" max="1000" value="400">
@@ -103,79 +95,72 @@
     </aside>
 
     <main class="main-content">
-        <div id="preview-text" contenteditable="true">Dashboard Flex</div>
-        
+        <div id="preview-text" contenteditable="true">G Sans Flex</div>
         <div class="charts-container">
             <canvas id="fontChart"></canvas>
         </div>
     </main>
 
-    <div class="code-output" id="css-code">font-variation-settings: ...</div>
-
     <script>
-        // --- 1. INICIALIZAR SORTABLEJS ---
-        const el = document.getElementById('controls-list');
-        Sortable.create(el, {
-            animation: 150,
-            ghostClass: 'blue-background-class'
-        });
+        // --- DEPURACIÓN: ¿Están las librerías cargadas? ---
+        window.onload = () => {
+            if (typeof Sortable === 'undefined') console.error("❌ SortableJS no cargó. Revisa js/Sortable.min.js");
+            if (typeof Chart === 'undefined') console.error("❌ Chart.js no cargó. Revisa js/chart.min.js");
+            
+            document.fonts.ready.then(() => {
+                if (!document.fonts.check('1em "GSansFlex"')) console.warn("⚠️ Fuente no detectada en fonts/GoogleSansFlex.ttf");
+            });
 
-        // --- 2. INICIALIZAR CHART.JS ---
-        const ctx = document.getElementById('fontChart').getContext('2d');
-        const fontChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-                labels: ['Weight', 'Width', 'Round', 'Grade', 'Optical', 'Slant'],
-                datasets: [{
-                    label: 'Configuración de Fuente',
-                    data: [400, 100, 0, 0, 14, 0],
-                    backgroundColor: 'rgba(88, 166, 255, 0.2)',
-                    borderColor: '#58a6ff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                scales: { r: { beginAtZero: true, grid: { color: '#30363d' }, ticks: { display: false } } },
-                plugins: { legend: { display: false } }
+            // Inicializar Sortable
+            const el = document.getElementById('controls-list');
+            if (typeof Sortable !== 'undefined') Sortable.create(el, { animation: 150 });
+
+            // Inicializar Chart
+            if (typeof Chart !== 'undefined') {
+                const ctx = document.getElementById('fontChart').getContext('2d');
+                window.myChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Weight', 'Width', 'Round', 'Grade', 'Optical', 'Slant'],
+                        datasets: [{
+                            data: [400, 100, 0, 0, 14, 0],
+                            backgroundColor: 'rgba(88, 166, 255, 0.2)',
+                            borderColor: '#58a6ff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        scales: { r: { beginAtZero: true, grid: { color: '#333' }, ticks: { display: false } } },
+                        plugins: { legend: { display: false } },
+                        maintainAspectRatio: false
+                    }
+                });
             }
-        });
+        };
 
-        // --- 3. LÓGICA DE ACTUALIZACIÓN ---
-        const inputs = document.querySelectorAll('input[type="range"]');
-        
-        function updateAll() {
-            const vals = {
-                wght: document.getElementById('wght').value,
-                wdth: document.getElementById('wdth').value,
-                ROND: document.getElementById('ROND').value,
-                GRAD: document.getElementById('GRAD').value,
-                opsz: document.getElementById('opsz').value,
-                slnt: document.getElementById('slnt').value
+        // --- LÓGICA DE ACTUALIZACIÓN ---
+        document.querySelectorAll('input').forEach(input => {
+            input.oninput = (e) => {
+                const val = e.target.value;
+                const id = e.target.id;
+                document.documentElement.style.setProperty(`--${id}`, val);
+                document.getElementById(`v-${id}`).innerText = val;
+
+                if (window.myChart) {
+                    // Actualizamos el radar
+                    const chartData = [
+                        document.getElementById('wght').value / 10,
+                        document.getElementById('wdth').value,
+                        document.getElementById('ROND').value,
+                        (parseInt(document.getElementById('GRAD').value) + 200) / 3.5,
+                        document.getElementById('opsz').value,
+                        Math.abs(document.getElementById('slnt').value) * 10
+                    ];
+                    window.myChart.data.datasets[0].data = chartData;
+                    window.myChart.update('none'); // Update sin animaciones para mayor fluidez
+                }
             };
-
-            // Aplicar CSS
-            for (let key in vals) {
-                document.documentElement.style.setProperty(`--${key}`, vals[key]);
-                document.getElementById(`v-${key}`).innerText = vals[key];
-            }
-
-            // Actualizar Gráfico (Normalizando valores para que el radar se vea bien)
-            fontChart.data.datasets[0].data = [
-                vals.wght / 10,
-                vals.wdth,
-                vals.ROND,
-                (vals.GRAD + 200) / 3.5,
-                vals.opsz,
-                Math.abs(vals.slnt) * 10
-            ];
-            fontChart.update();
-
-            // Actualizar Código
-            document.getElementById('css-code').innerText = `font-variation-settings: 'wght' ${vals.wght}, 'wdth' ${vals.wdth}, 'ROND' ${vals.ROND}, 'GRAD' ${vals.GRAD}, 'opsz' ${vals.opsz}, 'slnt' ${vals.slnt};`;
-        }
-
-        inputs.forEach(i => i.addEventListener('input', updateAll));
-        updateAll(); // Primera carga
+        });
     </script>
 </body>
 </html>
