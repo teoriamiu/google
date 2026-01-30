@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sans Flex: Master Dashboard</title>
+    <title>Google Sans Flex: Master Dashboard 2.0</title>
     
     <script src="./js/sortable/sortable.min.js"></script>
     <script src="./js/chart/chart.min.js"></script>
@@ -11,7 +11,6 @@
     <style>
         @font-face {
             font-family: 'GSansFlex';
-            /* RUTA CORREGIDA: Entra a fonts/ y busca el archivo */
             src: url('./fonts/GoogleSansFlex.ttf') format('truetype');
             font-weight: 100 1000;
         }
@@ -24,48 +23,94 @@
         body {
             font-family: 'GSansFlex', sans-serif;
             background: var(--bg); color: #c9d1d9;
-            margin: 0; display: grid; grid-template-columns: 320px 1fr;
-            height: 100vh; overflow: hidden;
+            margin: 0; padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: row; /* Desktop por defecto */
         }
 
-        /* --- SIDEBAR --- */
+        /* --- SIDEBAR (Izquierda en Desktop, Abajo en Móvil) --- */
         .sidebar {
-            background: var(--panel); padding: 20px;
-            border-right: 1px solid #30363d; display: flex; flex-direction: column;
+            width: 320px;
+            background: var(--panel);
+            padding: 20px;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            z-index: 10;
         }
+
+        h3 { margin-top: 0; font-size: 1.2rem; color: var(--accent); }
 
         .control-card {
-            background: #21262d; padding: 12px; border-radius: 8px;
-            margin-bottom: 10px; cursor: grab; border: 1px solid #30363d;
+            background: #21262d; 
+            padding: 15px; 
+            border-radius: 12px;
+            margin-bottom: 12px; 
+            cursor: grab; 
+            border: 1px solid #30363d;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .label-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px; }
+        .label-row { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 10px; opacity: 0.8; }
         .val { color: var(--accent); font-weight: bold; }
         input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
 
-        /* --- PREVIEW --- */
+        /* --- MAIN CONTENT --- */
         .main-content {
-            display: grid; grid-template-rows: 1fr 250px; padding: 20px; gap: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 40px;
+            gap: 20px;
+            overflow: hidden;
+            justify-content: center;
+        }
+
+        .preview-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.02);
+            border-radius: 20px;
+            border: 1px dashed #30363d;
         }
 
         #preview-text {
-            font-size: 7vw; text-align: center; align-self: center; outline: none;
+            width: 100%;
+            font-size: clamp(2rem, 10vw, 8rem); /* Tamaño fluido */
+            text-align: center;
+            outline: none;
+            padding: 20px;
             font-variation-settings: 'wght' var(--wght), 'wdth' var(--wdth), 'opsz' var(--opsz), 'GRAD' var(--GRAD), 'slnt' var(--slnt), 'ROND' var(--ROND);
             font-optical-sizing: none;
+            word-wrap: break-word;
         }
 
         .charts-container {
-            background: rgba(255,255,255,0.02); border-radius: 12px;
-            padding: 15px; display: flex; justify-content: center;
+            height: 250px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
         }
 
-        canvas { max-width: 100%; height: 220px !important; }
+        /* --- RESPONSIVE --- */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar { width: auto; border-right: none; border-top: 1px solid #30363d; order: 2; height: auto; }
+            .main-content { order: 1; height: 80vh; padding: 20px; }
+            .preview-container { min-height: 300px; }
+            .charts-container { height: 200px; }
+        }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <h3>Lab Console</h3>
+        <h3>Flex Controls</h3>
         <div id="controls-list">
             <div class="control-card" data-id="wght">
                 <div class="label-row"><span>WEIGHT</span> <span class="val" id="v-wght">400</span></div>
@@ -95,72 +140,65 @@
     </aside>
 
     <main class="main-content">
-        <div id="preview-text" contenteditable="true">G Sans Flex</div>
+        <div class="preview-container">
+            <div id="preview-text" contenteditable="true">Google Sans Flex</div>
+        </div>
         <div class="charts-container">
             <canvas id="fontChart"></canvas>
         </div>
     </main>
 
     <script>
-        // --- DEPURACIÓN: ¿Están las librerías cargadas? ---
         window.onload = () => {
-            if (typeof Sortable === 'undefined') console.error("❌ SortableJS no cargó. Revisa js/Sortable.min.js");
-            if (typeof Chart === 'undefined') console.error("❌ Chart.js no cargó. Revisa js/chart.min.js");
-            
-            document.fonts.ready.then(() => {
-                if (!document.fonts.check('1em "GSansFlex"')) console.warn("⚠️ Fuente no detectada en fonts/GoogleSansFlex.ttf");
-            });
-
-            // Inicializar Sortable
+            // Sortable
             const el = document.getElementById('controls-list');
-            if (typeof Sortable !== 'undefined') Sortable.create(el, { animation: 150 });
+            if (typeof Sortable !== 'undefined') {
+                Sortable.create(el, { animation: 150 });
+            }
 
-            // Inicializar Chart
+            // Chart Doughnut
+            let myChart;
             if (typeof Chart !== 'undefined') {
                 const ctx = document.getElementById('fontChart').getContext('2d');
-                window.myChart = new Chart(ctx, {
+                myChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Weight', 'Width', 'Round', 'Grade', 'Optical', 'Slant'],
                         datasets: [{
-                            data: [400, 100, 0, 0, 14, 0],
-                            backgroundColor: 'rgba(88, 166, 255, 0.2)',
-                            borderColor: '#58a6ff',
-                            borderWidth: 2
+                            data: [400, 100, 1, 1, 14, 1],
+                            backgroundColor: ['#58a6ff', '#3fb950', '#d29922', '#f85149', '#8b949e', '#db61a2'],
+                            borderWidth: 0,
+                            cutout: '80%'
                         }]
                     },
                     options: {
-                        scales: { r: { beginAtZero: true, grid: { color: '#333' }, ticks: { display: false } } },
-                        plugins: { legend: { display: false } },
-                        maintainAspectRatio: false
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'bottom', labels: { color: '#8b949e', boxWidth: 10 } } }
                     }
                 });
             }
+
+            // Update
+            document.querySelectorAll('input').forEach(input => {
+                input.oninput = (e) => {
+                    const val = e.target.value;
+                    const id = e.target.id;
+                    document.documentElement.style.setProperty(`--${id}`, val);
+                    document.getElementById(`v-${id}`).innerText = val;
+
+                    if (myChart) {
+                        const idx = { 'wght': 0, 'wdth': 1, 'ROND': 2, 'GRAD': 3, 'opsz': 4, 'slnt': 5 };
+                        // Normalización básica para el gráfico
+                        let chartVal = Math.abs(parseFloat(val));
+                        if(id === 'wght') chartVal = val / 2;
+                        if(id === 'GRAD') chartVal = (chartVal + 200) / 4;
+                        
+                        myChart.data.datasets[0].data[idx[id]] = chartVal || 1; 
+                        myChart.update('none');
+                    }
+                };
+            });
         };
-
-        // --- LÓGICA DE ACTUALIZACIÓN ---
-        document.querySelectorAll('input').forEach(input => {
-            input.oninput = (e) => {
-                const val = e.target.value;
-                const id = e.target.id;
-                document.documentElement.style.setProperty(`--${id}`, val);
-                document.getElementById(`v-${id}`).innerText = val;
-
-                if (window.myChart) {
-                    // Actualizamos el radar
-                    const chartData = [
-                        document.getElementById('wght').value / 10,
-                        document.getElementById('wdth').value,
-                        document.getElementById('ROND').value,
-                        (parseInt(document.getElementById('GRAD').value) + 200) / 3.5,
-                        document.getElementById('opsz').value,
-                        Math.abs(document.getElementById('slnt').value) * 10
-                    ];
-                    window.myChart.data.datasets[0].data = chartData;
-                    window.myChart.update('none'); // Update sin animaciones para mayor fluidez
-                }
-            };
-        });
     </script>
 </body>
 </html>
